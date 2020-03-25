@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {Card,Icon,List} from 'antd'
 import {reqCategory} from '../../api/index'
+import {BASE_IMGURL} from '../../utils/constants'
 const Item=List.Item
 export default class Detail extends Component {
     constructor(props) {
@@ -40,6 +41,7 @@ export default class Detail extends Component {
             </div>
          )
         const {name,desc,price,imgs,detail}=this.props.location.state
+        
         const {cName1,cName2}=this.state
         return (
             <Card title={title} style={{ width:'100%',height:'100%' }}>
@@ -65,7 +67,7 @@ export default class Detail extends Component {
                         <div>
                             {
                                 imgs.map(item=>(
-                                    <img key={item} style={{width:'100px',marginRight:'10px'}} src={item} alt="" />
+                                    <img key={item} style={{width:'100px',marginRight:'10px'}} src={BASE_IMGURL+item} alt="" />
                                 ))
                             }
                         </div>

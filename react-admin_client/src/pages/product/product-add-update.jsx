@@ -1,18 +1,21 @@
 import React, { Component } from 'react'
-import {reqCategorys} from '../../api/index'
+import {reqCategorys,reqProductAddUpdate} from '../../api/index'
 import {Card,Icon,Form,Input,Cascader,Button,message} from 'antd'
+import PicturesWall from './pictures-wall'
+import TextEditor from './textEditor'
 const {Item}=Form
-const {TextArea} = Input
+const { TextArea } = Input
 class ProductAddUpdate extends Component {
     constructor(props) {
         super(props);
+        this.imgRef = React.createRef();//用于父调用子的数据
+        this.editor=React.createRef();
         this.state = {
             options:[]
         }
     }
     /**验证价格 */
     validatorPrice=(rule,value,callback)=>{
-        console.log(value)
      if(value*1>0){
          callback()
      }else{
@@ -40,7 +43,7 @@ class ProductAddUpdate extends Component {
           isLeaf:false
         }))
         const {isUpdate,product}=this
-        const {pCategoryId,categoryId,name,desc,price}=product
+        const {pCategoryId}=product
         if(isUpdate){
             const subCategorys=await this.getCategorys(pCategoryId)
             const childOptions=subCategorys.map(item=>({
@@ -75,12 +78,31 @@ class ProductAddUpdate extends Component {
             targetOption.isLeaf=true
         }
       }
-    submit=()=>{
-        this.props.form.validateFields((errors, values)=>{
+    submit= ()=>{
+        this.props.form.validateFields(async(errors, values)=>{
           if(!errors){
-
-          }else{
-              
+              const {name, desc, price,categorys} = values
+              const imgs=this.imgRef.current.getImgs()//图片数组
+              const detail=this.editor.current.getDetail()//副文件内容
+              let  pCategoryId,categoryId
+              if(categorys.length===1){
+                  pCategoryId="0"
+                  categoryId=categorys[0]
+              }else{
+                pCategoryId=categorys[0]
+                categoryId=categorys[1]
+              }
+              const product={name, desc, price,imgs,detail, pCategoryId, categoryId}
+              if(this.isUpdate){
+                product._id=this.product._id
+              }
+              const result= await reqProductAddUpdate(product);
+              if(result.data.status===0){
+                  message.success(`${this.isUpdate?'更新':'添加'}商品成功`)
+                  this.props.history.goBack()
+              }else{
+                message.error(`${this.isUpdate?'更新':'添加'}商品商品失败`)
+              }
           }
         })
     }
@@ -96,9 +118,9 @@ class ProductAddUpdate extends Component {
     render() {
         const {isUpdate,product}=this
         const {getFieldDecorator}=this.props.form
-        const {pCategoryId,categoryId,name,desc,price}=product
+        const {pCategoryId,categoryId,name,desc,price,imgs,detail}=product
         const categorys=[]
-        if(pCategoryId=="0"){
+        if(pCategoryId==="0"){
             categorys.push(categoryId)
         }else{
             categorys.push(pCategoryId)
@@ -120,7 +142,7 @@ class ProductAddUpdate extends Component {
         }
         
         return (
-            <Card title={title} style={{ width:'100%',height:'100%' }}>
+            <Card title={title} style={{ width:'100%',height:'100%',overflow:'auto'}}>
                 <Form {...formItemLayout}>
                     <Item label="商品名称">
                         {
@@ -139,7 +161,7 @@ class ProductAddUpdate extends Component {
                                 rules: [
                                 {required: true, message: '必须输入商品描述'}
                                 ]
-                            })(<TextArea placeholder="请输入商品描述" autosize={{ minRows: 2, maxRows: 6 }} />)
+                            })(<TextArea placeholder="请输入商品描述"  minrows={2} />)
                         }
                     </Item>
                     <Item label="商品价格">
@@ -166,10 +188,15 @@ class ProductAddUpdate extends Component {
                             />)
                         }
                     </Item>
-
+                    <Item label="商品图片">
+                        <PicturesWall ref={this.imgRef} imgs={imgs} /> 
+                    </Item>
+                    <Item label="商品详情" labelCol={{span:2}}  wrapperCol={{span:20}}>  
+                        <TextEditor ref={this.editor}  detail={detail} /> 
+                    </Item>
                     <Item>
                          <Button type="primary" onClick={this.submit}>提交</Button>
-                    </Item>   
+                    </Item>    
                 </Form>
             </Card>
         );

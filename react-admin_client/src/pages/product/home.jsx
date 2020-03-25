@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import './home.less'
 import{Card,Select,Input,Button,Icon,Table, message} from 'antd'
 import {PAGESIZE} from '../../utils/constants'
-import {reqProducts,reqSearchProducts,reqUpdateStatus,reqProductUpdate} from '../../api/index'
-import Search from 'antd/lib/transfer/search'
+import {reqProducts,reqSearchProducts,reqUpdateStatus} from '../../api/index'
 const Option=Select.Option
 export default class Home extends Component {
     constructor(props) {
@@ -45,12 +44,12 @@ export default class Home extends Component {
                     <div className="btnDiv">
                        <Button type="primary" onClick={()=>this.updateStatus(_id,newStatus)}>
                         {
-                            status==1?'下架':'上架'
+                            status===1?'下架':'上架'
                         }
                        </Button>
                        <span style={{marginLeft:'10px',color:'#222'}}> 
                          {
-                            status==1?'在售':'已下架'
+                            status===1?'在售':'已下架'
                           }
                        </span>
                     </div>
@@ -77,7 +76,7 @@ export default class Home extends Component {
         this.setState({loading:true})
         const {searchName,searchType}=this.state
         let result
-        if(searchName && searchName!=""){
+        if(searchName && searchName!==""){
             result=await reqSearchProducts({pageNum,pageSize:PAGESIZE,searchName,searchType})
         }else{
             result=await reqProducts(pageNum,PAGESIZE)
@@ -134,7 +133,7 @@ export default class Home extends Component {
          )
         
         return (
-          <Card className="cardtitle" title={title} extra={extra} style={{ width:'100%',height:'100%' }}>
+          <Card className="cardtitle" title={title} extra={extra} style={{ width:'100%',height:'100%',overflow:'auto' }}>
               <Table  
                 bordered 
                 rowKey='_id'
@@ -145,7 +144,8 @@ export default class Home extends Component {
                     defaultPageSize:PAGESIZE,
                     showQuickJumper:true,
                     onChange:this.getProducts ,
-                    total
+                    total,
+                    current:this.pageNum
                 }}
                
                 />
