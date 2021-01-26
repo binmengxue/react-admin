@@ -1,5 +1,15 @@
 # react-admin
-这个是后台管理项目，品类管理，商品管理，用户管理，角色还了，图形管理,页面的UI用到antd，请求axios，状态redux,路由react-router，图片echarts,编译less
+前端数据展现、交互、组件化
+   react,antd,react-router,redux
+前后台交互
+  ajax请求：axios,jsonp,promise/async/await
+  接口测试工具：postman
+模块化
+  ES6，CommonJS
+工具构建/工程化
+  webpack.create-react-app,eslint
+开发工具
+  vscode
 #下面是各页面展示图
  ![image](https://github.com/binmengxue/react-admin/blob/master/1.png?raw=true)
  ![image](https://github.com/binmengxue/react-admin/blob/master/2.png?raw=true)
